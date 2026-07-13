@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme {
+  /* 60% NEUTRAL: High contrast, clean canvas */
+  --color-surface-light: #f8fafc; /* Screen background */
+  --color-surface-card: #ffffff;  /* Portfolio cards */
+  --color-surface-dark: #0f172a;  /* Core text */
+  --color-surface-muted: #64748b; /* Subtitles/meta data */
+
+  /* 30% PRIMARY: Deep Teal for professionalism */
+  --color-primary-light: #e6f4f5;
+  --color-primary: #0f6870;       /* Base primary */
+  --color-primary-dark: #0a484e;
+
+  /* SECONDARY: Warm Amber for earnings, ratings, and stats */
+  --color-secondary-light: #fef3c7;
+  --color-secondary: #f59e0b;     /* Base secondary */
+  --color-secondary-dark: #d97706;
+
+  /* 10% ACCENT: Crimson Red reserved for high-stakes safety features */
+  --color-emergency-light: #fee2e2;
+  --color-emergency: #991b1b;     /* Base emergency */
+  --color-emergency-dark: #7f1d1d;
+}
