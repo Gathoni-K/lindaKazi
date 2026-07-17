@@ -6,17 +6,24 @@ import Avatar from "./Avatar";
 import { useTheme } from "../context/ThemeContext";
 import { useAuth } from "../context/AuthContext";
 
-const links = [
+const workerLinks = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
   { label: "Safety", to: "/dashboard/safety", icon: ShieldCheck },
   { label: "Earnings", to: "/dashboard/earnings", icon: Wallet },
 ];
+
+const clientLinks = [{ label: "Dashboard", to: "/client-dashboard", icon: LayoutDashboard }];
 
 export default function DashboardNavbar() {
   const [open, setOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  const isWorker = user?.role === "worker";
+  const links = isWorker ? workerLinks : clientLinks;
+  const homeTo = isWorker ? "/dashboard" : "/client-dashboard";
+  const badgeLabel = isWorker ? "Verified Worker" : "Verified Client";
 
   const handleLogout = () => {
     logout();
@@ -32,7 +39,7 @@ export default function DashboardNavbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-line/60 bg-ink/85 backdrop-blur">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
-        <Link to="/dashboard" className="flex items-center gap-2">
+        <Link to={homeTo} className="flex items-center gap-2">
           <Logo size={26} />
           <span className="font-display text-base font-semibold tracking-tight text-paper">
             LindaKazi
@@ -42,7 +49,7 @@ export default function DashboardNavbar() {
         <ul className="hidden items-center gap-7 md:flex">
           {links.map((l) => (
             <li key={l.label}>
-              <NavLink to={l.to} end={l.to === "/dashboard"} className={navLinkClass}>
+              <NavLink to={l.to} end={l.to === homeTo} className={navLinkClass}>
                 <l.icon size={15} />
                 {l.label}
               </NavLink>
@@ -61,7 +68,7 @@ export default function DashboardNavbar() {
 
           <span className="flex items-center gap-1.5 rounded-pill border border-teal/30 bg-teal/10 px-3 py-1.5 font-mono text-[11px] font-semibold text-teal">
             <ShieldCheck size={13} />
-            Verified Worker
+            {badgeLabel}
           </span>
 
           {user && <Avatar name={user.name} />}
@@ -92,7 +99,7 @@ export default function DashboardNavbar() {
               <li key={l.label}>
                 <NavLink
                   to={l.to}
-                  end={l.to === "/dashboard"}
+                  end={l.to === homeTo}
                   onClick={() => setOpen(false)}
                   className={navLinkClass}
                 >

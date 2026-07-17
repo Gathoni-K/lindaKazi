@@ -1,8 +1,11 @@
-import { ShieldCheck } from "lucide-react";
+import { ShieldCheck, Sparkles } from "lucide-react";
 import RiskScoreCard from "./RiskScoreCard";
 import Reveal from "./Reveal";
+import { useRoleCTA } from "../hooks/useRoleCTA";
 
 export default function Hero() {
+  const goTo = useRoleCTA();
+
   return (
     <section id="top" className="relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -14,7 +17,12 @@ export default function Hero() {
 
       <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-[1.1fr_0.9fr] lg:py-28">
         <Reveal>
-            <h1 className="mt-6 font-display text-4xl font-bold leading-[1.08] tracking-tight text-paper sm:text-5xl lg:text-[3.4rem]">
+          <span className="inline-flex items-center gap-2 rounded-pill border border-teal/30 bg-teal/10 px-3 py-1 font-mono text-xs text-teal-soft">
+            <Sparkles size={13} />
+            Institutional-grade safety, built for gig work
+          </span>
+
+          <h1 className="mt-6 font-display text-4xl font-bold leading-[1.08] tracking-tight text-paper sm:text-5xl lg:text-[3.4rem]">
             The trust layer
             <br />
             <span className="bg-gradient-to-r from-teal via-teal-soft to-amber bg-clip-text text-transparent">
@@ -29,19 +37,19 @@ export default function Hero() {
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a
-              href="#pricing"
+            <button
+              onClick={() => goTo("worker")}
               className="inline-flex items-center justify-center gap-2 rounded-pill bg-teal px-6 py-3 text-sm font-semibold text-ink shadow-[0_0_30px_-5px_rgba(46,230,199,0.6)] transition-transform hover:-translate-y-0.5 hover:bg-teal-dim"
             >
               <ShieldCheck size={17} />
               Protect My Gigs — Workers
-            </a>
-            <a
-              href="#pricing"
+            </button>
+            <button
+              onClick={() => goTo("client")}
               className="inline-flex items-center justify-center gap-2 rounded-pill border border-line px-6 py-3 text-sm font-semibold text-paper transition-all hover:-translate-y-0.5 hover:border-teal/50 hover:text-teal-soft"
             >
               Verify My Workers — Clients
-            </a>
+            </button>
           </div>
 
           <p className="mt-6 font-mono text-xs text-mist-dim">

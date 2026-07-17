@@ -1,14 +1,20 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ShieldCheck, Briefcase, UserCheck, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import Logo from "../components/Logo";
 import Reveal from "../components/Reveal";
 import { useAuth } from "../context/AuthContext";
 import type { UserRole } from "../context/AuthContext";
 
+interface LocationState {
+  role?: UserRole;
+}
+
 export default function Login() {
-  const [role, setRole] = useState<UserRole>("worker");
+  const location = useLocation();
+  const preselectedRole = (location.state as LocationState | null)?.role;
+  const [role, setRole] = useState<UserRole>(preselectedRole ?? "worker");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,9 +26,8 @@ export default function Login() {
     e.preventDefault();
     if (!name.trim() || !email.trim() || !password.trim()) return;
     login({ name: name.trim(), email: email.trim(), role });
-    navigate(role === "worker" ? "/dashboard" : "/");
+    navigate(role === "worker" ? "/dashboard" : "/client-dashboard");
   };
-
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-5 py-16 sm:px-8">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
