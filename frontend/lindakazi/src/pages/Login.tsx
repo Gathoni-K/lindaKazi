@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ShieldCheck, Briefcase, UserCheck, Mail, Lock, User } from "lucide-react";
+import { ShieldCheck, Briefcase, UserCheck, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import Logo from "../components/Logo";
 import Reveal from "../components/Reveal";
 import { useAuth } from "../context/AuthContext";
@@ -12,6 +12,7 @@ export default function Login() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -19,7 +20,7 @@ export default function Login() {
     e.preventDefault();
     if (!name.trim() || !email.trim() || !password.trim()) return;
     login({ name: name.trim(), email: email.trim(), role });
-    navigate("/");
+    navigate(role === "worker" ? "/dashboard" : "/");
   };
 
   return (
@@ -111,13 +112,21 @@ export default function Login() {
               <span className="flex items-center gap-2 rounded-lg border border-line bg-ink px-3 py-2.5 transition-colors focus-within:border-teal/60">
                 <Lock size={15} className="text-mist-dim" />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="w-full bg-transparent text-sm text-paper placeholder:text-mist-dim focus:outline-none"
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="text-mist-dim transition-colors hover:text-teal"
+                >
+                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
               </span>
             </label>
 
@@ -129,7 +138,12 @@ export default function Login() {
               Sign In as {role === "worker" ? "Worker" : "Client"}
             </button>
           </form>
-         </div>
+
+          <p className="mt-6 text-center font-mono text-[11px] text-mist-dim">
+            No backend is connected yet — this signs you in locally and keeps
+            you signed in across refreshes so you can preview the dashboard.
+          </p>
+        </div>
 
         <p className="mt-6 text-center text-sm text-mist">
           <Link to="/" className="text-teal-soft hover:text-teal">
