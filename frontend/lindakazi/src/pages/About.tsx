@@ -1,6 +1,6 @@
 import { HeartHandshake, Radio, Users } from "lucide-react";
 import Reveal from "../components/Reveal";
-import Footer from "../components/Footer";
+
 
 const pillars = [
   {
@@ -79,7 +79,7 @@ export default function About() {
         </Reveal>
       </section>
 
-      <Footer />
+     
     </>
   );
 }

@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import ScrollToTopButton from "./components/ScrollToTopButton";
 import ScrollToHash from "./components/ScrollToHash";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -14,10 +15,10 @@ import Earnings from "./pages/dashboard/Earnings";
 
 function PublicSite() {
   return (
-    <div className="min-h-screen bg-ink">
+    <div className="flex min-h-screen flex-col bg-ink">
       <ScrollToHash />
       <Navbar />
-      <main>
+      <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
@@ -25,6 +26,7 @@ function PublicSite() {
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         </Routes>
       </main>
+      <Footer />
       <ScrollToTopButton />
     </div>
   );
@@ -45,6 +47,9 @@ export default function App() {
         <Route path="safety" element={<Safety />} />
         <Route path="earnings" element={<Earnings />} />
       </Route>
+
+  
+
       <Route path="/*" element={<PublicSite />} />
     </Routes>
   );

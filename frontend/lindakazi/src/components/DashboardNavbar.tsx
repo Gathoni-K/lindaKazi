@@ -39,7 +39,7 @@ export default function DashboardNavbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-line/60 bg-ink/85 backdrop-blur">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
-        <Link to={homeTo} className="flex items-center gap-2">
+        <Link to='/' className="flex items-center gap-2">
           <Logo size={26} />
           <span className="font-display text-base font-semibold tracking-tight text-paper">
             LindaKazi

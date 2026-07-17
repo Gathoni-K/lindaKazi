@@ -1,6 +1,6 @@
 import { Lock, Scale } from "lucide-react";
 import Reveal from "../components/Reveal";
-import Footer from "../components/Footer";
+
 
 const sections = [
   {
@@ -59,7 +59,7 @@ export default function PrivacyPolicy() {
         </div>
       </section>
 
-      <Footer />
+      
     </>
   );
 }

@@ -17,12 +17,7 @@ export default function Hero() {
 
       <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-[1.1fr_0.9fr] lg:py-28">
         <Reveal>
-          <span className="inline-flex items-center gap-2 rounded-pill border border-teal/30 bg-teal/10 px-3 py-1 font-mono text-xs text-teal-soft">
-            <Sparkles size={13} />
-            Institutional-grade safety, built for gig work
-          </span>
-
-          <h1 className="mt-6 font-display text-4xl font-bold leading-[1.08] tracking-tight text-paper sm:text-5xl lg:text-[3.4rem]">
+                    <h1 className="mt-6 font-display text-4xl font-bold leading-[1.08] tracking-tight text-paper sm:text-5xl lg:text-[3.4rem]">
             The trust layer
             <br />
             <span className="bg-gradient-to-r from-teal via-teal-soft to-amber bg-clip-text text-transparent">
