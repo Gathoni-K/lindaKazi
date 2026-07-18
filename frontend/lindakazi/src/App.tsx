@@ -12,6 +12,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import WorkerDashboard from "./pages/dashboard/WorkerDashboard";
 import Safety from "./pages/dashboard/Safety";
 import Earnings from "./pages/dashboard/Earnings";
+import ClientDashboard from "./pages/dashboard/ClientDashboard";
 
 function PublicSite() {
   return (
@@ -48,7 +49,16 @@ export default function App() {
         <Route path="earnings" element={<Earnings />} />
       </Route>
 
-  
+      <Route
+        path="/client-dashboard"
+        element={
+          <ProtectedRoute allowedRole="client">
+            <DashboardLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<ClientDashboard />} />
+      </Route>
 
       <Route path="/*" element={<PublicSite />} />
     </Routes>
