@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Menu, X, Sun, Moon, LogOut, ShieldCheck, LayoutDashboard, Wallet } from "lucide-react";
+import { Menu, X, Sun, Moon, LogOut, ShieldCheck, LayoutDashboard, Wallet, Siren } from "lucide-react";
 import Logo from "./Logo";
 import Avatar from "./Avatar";
 import { useTheme } from "../context/ThemeContext";
@@ -10,9 +10,13 @@ const workerLinks = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
   { label: "Safety", to: "/dashboard/safety", icon: ShieldCheck },
   { label: "Earnings", to: "/dashboard/earnings", icon: Wallet },
+  { label: "Alerts", to: "/dashboard/alerts", icon: Siren },
 ];
 
-const clientLinks = [{ label: "Dashboard", to: "/client-dashboard", icon: LayoutDashboard }];
+const clientLinks = [
+  { label: "Dashboard", to: "/client-dashboard", icon: LayoutDashboard },
+  { label: "Alerts", to: "/client-dashboard/alerts", icon: Siren },
+];
 
 export default function DashboardNavbar() {
   const [open, setOpen] = useState(false);
