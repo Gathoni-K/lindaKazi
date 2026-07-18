@@ -1,7 +1,9 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import { Phone, Hash, Plus, Trash2, ShieldAlert, Siren } from "lucide-react";
 import Reveal from "../../components/Reveal";
+import { useAlerts } from "../../context/AlertContext";
 
 interface EmergencyContact {
   id: string;
@@ -25,7 +27,13 @@ export default function Safety() {
   const [contacts, setContacts] = useState<EmergencyContact[]>(initialContacts);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const { triggerSOS } = useAlerts();
+  const navigate = useNavigate();
 
+  const handleTriggerSOS = () => {
+    triggerSOS("Manual Trigger — Safety Page");
+    navigate("/dashboard/alerts");
+  };
   const addContact = (e: FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !phone.trim()) return;
@@ -65,10 +73,17 @@ export default function Safety() {
               to trigger an instant SOS. This works even with zero data — the alert routes over
               Voice/DTMF and SMS, not the internet.
             </p>
-            <div className="mt-4 flex items-center gap-2 rounded-lg border border-line bg-ink px-3 py-2.5 font-mono text-xs text-mist">
+             <div className="mt-4 flex items-center gap-2 rounded-lg border border-line bg-ink px-3 py-2.5 font-mono text-xs text-mist">
               <Hash size={14} className="text-amber" />
               Dial <span className="text-paper">*483*9#</span> to activate manually
             </div>
+            <button
+              onClick={handleTriggerSOS}
+              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-pill bg-danger px-5 py-3 text-sm font-semibold text-ink transition-transform hover:-translate-y-0.5 hover:bg-danger/85"
+            >
+              <Siren size={16} />
+              Trigger SOS
+            </button>
           </div>
         </Reveal>
 
