@@ -5,13 +5,16 @@ import "./index.css";
 import App from "./App.tsx";
 import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider } from "./context/AuthContext";
+import { AlertProvider } from "./context/AlertContext";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <ThemeProvider>
         <AuthProvider>
-          <App />
+          <AlertProvider>
+            <App />
+          </AlertProvider>
         </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>
