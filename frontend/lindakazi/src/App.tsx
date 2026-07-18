@@ -13,6 +13,8 @@ import WorkerDashboard from "./pages/dashboard/WorkerDashboard";
 import Safety from "./pages/dashboard/Safety";
 import Earnings from "./pages/dashboard/Earnings";
 import ClientDashboard from "./pages/dashboard/ClientDashboard";
+import WorkerAlerts from "./pages/dashboard/WorkerAlerts";
+import ClientAlerts from "./pages/dashboard/ClientAlerts";
 
 function PublicSite() {
   return (
@@ -47,6 +49,7 @@ export default function App() {
         <Route index element={<WorkerDashboard />} />
         <Route path="safety" element={<Safety />} />
         <Route path="earnings" element={<Earnings />} />
+         <Route path="alerts" element={<WorkerAlerts />} />
       </Route>
 
       <Route
@@ -58,6 +61,7 @@ export default function App() {
         }
       >
         <Route index element={<ClientDashboard />} />
+        <Route path="alerts" element={<ClientAlerts />} />
       </Route>
 
       <Route path="/*" element={<PublicSite />} />
