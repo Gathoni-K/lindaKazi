@@ -25,7 +25,7 @@ export default function Login() {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !email.trim() || !password.trim()) return;
-    login({ name: name.trim(), email: email.trim(), role });
+    login({ id: String(Date.now()), name: name.trim(), email: email.trim(), role }, "local-token");
     navigate(role === "worker" ? "/dashboard" : "/client-dashboard");
   };
   return (
