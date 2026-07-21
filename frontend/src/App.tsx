@@ -1,4 +1,6 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+
+import { Routes, Route } from "react-router-dom";
+
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ScrollToTopButton from "./components/ScrollToTopButton";
@@ -6,7 +8,9 @@ import ScrollToHash from "./components/ScrollToHash";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
 import Home from "./pages/Home";
-import SignUp from "./pages/SignUp";
+
+import Login from "./pages/Login";
+
 import About from "./pages/About";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import WorkerDashboard from "./pages/dashboard/WorkerDashboard";
@@ -24,10 +28,9 @@ function PublicSite() {
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
-          {/* /signup is the real registration page */}
-          <Route path="/signup" element={<SignUp />} />
-          {/* /login kept as an alias so old links redirect gracefully */}
-          <Route path="/login" element={<Navigate to="/signup" replace />} />
+
+          <Route path="/login" element={<Login />} />
+
           <Route path="/about" element={<About />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         </Routes>
