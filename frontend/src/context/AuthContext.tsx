@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 export type UserRole = "worker" | "client";
 
 export interface AuthUser {
+
   id: string;
   name: string;
   email: string;
@@ -13,6 +14,7 @@ export interface AuthUser {
 
 interface AuthContextValue {
   user: AuthUser | null;
+
   token: string | null;
   /** Called after a successful backend sign-up. Stores the user session locally. */
   login: (user: AuthUser, token: string) => void;
@@ -21,13 +23,17 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
+
 const USER_KEY  = "lindakazi-auth-user";
 const TOKEN_KEY = "lindakazi-auth-token";
+
 
 function getStoredUser(): AuthUser | null {
   if (typeof window === "undefined") return null;
   try {
+
     const raw = window.localStorage.getItem(USER_KEY);
+
     return raw ? (JSON.parse(raw) as AuthUser) : null;
   } catch {
     return null;
@@ -66,6 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout }}>
+
       {children}
     </AuthContext.Provider>
   );
