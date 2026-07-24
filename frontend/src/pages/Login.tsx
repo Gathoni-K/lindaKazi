@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ShieldCheck, Briefcase, UserCheck, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
+import { ShieldCheck, Briefcase, UserCheck, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import Logo from "../components/Logo";
 import Reveal from "../components/Reveal";
 import { useAuth } from "../context/AuthContext";
@@ -11,11 +11,20 @@ interface LocationState {
   role?: UserRole;
 }
 
+
+function deriveNameFromEmail(email: string): string {
+  const local = email.split("@")[0] ?? "";
+  return local
+    .split(/[.\-_]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ") || "there";
+}
+
 export default function Login() {
   const location = useLocation();
   const preselectedRole = (location.state as LocationState | null)?.role;
   const [role, setRole] = useState<UserRole>(preselectedRole ?? "worker");
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -24,10 +33,12 @@ export default function Login() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !email.trim() || !password.trim()) return;
-    login({ id: String(Date.now()), name: name.trim(), email: email.trim(), role }, "local-token");
+    if (!email.trim() || !password.trim()) return;
+      const mockId = Date.now().toString();
+      login({ id: mockId, name: deriveNameFromEmail(email.trim()), email: email.trim(), role }, password.trim());
     navigate(role === "worker" ? "/dashboard" : "/client-dashboard");
   };
+
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-5 py-16 sm:px-8">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -48,6 +59,7 @@ export default function Login() {
             <p className="mt-1 text-sm text-mist">Sign in to continue to your safety loop</p>
           </div>
 
+          {/* Role toggle */}
           <div className="mb-6 grid grid-cols-2 gap-2 rounded-pill border border-line bg-ink p-1">
             <button
               type="button"
@@ -76,23 +88,6 @@ export default function Login() {
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <label className="flex flex-col gap-1.5">
-              <span className="font-mono text-[11px] uppercase tracking-wide text-mist-dim">
-                Full name
-              </span>
-              <span className="flex items-center gap-2 rounded-lg border border-line bg-ink px-3 py-2.5 transition-colors focus-within:border-teal/60">
-                <User size={15} className="text-mist-dim" />
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Amina Wanjiru"
-                  className="w-full bg-transparent text-sm text-paper placeholder:text-mist-dim focus:outline-none"
-                  required
-                />
-              </span>
-            </label>
-
             <label className="flex flex-col gap-1.5">
               <span className="font-mono text-[11px] uppercase tracking-wide text-mist-dim">
                 Email
@@ -151,8 +146,13 @@ export default function Login() {
         </div>
 
         <p className="mt-6 text-center text-sm text-mist">
-          <Link to="/" className="text-teal-soft hover:text-teal">
-            ← Back to home
+          Don't have an account?{" "}
+          <Link
+            to="/signup"
+            state={{ role }}
+            className="text-teal-soft hover:text-teal"
+          >
+            Sign up
           </Link>
         </p>
       </Reveal>
