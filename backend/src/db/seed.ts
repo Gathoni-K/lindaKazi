@@ -18,10 +18,13 @@ const db = drizzle(client, { schema });
 async function seed() {
   console.log('Seeding mock data for LindaKazi...');
 
+  const pastDate = new Date();
+  pastDate.setDate(pastDate.getDate() - 30); // 30 days ago
+
   try {
     // Insert 5 mock workers (3 low-risk, 2 high-risk) into users table
     const insertedWorkers = await db.insert(schema.users).values([
-      // Low risk workers
+      // Low risk workers (older accounts)
       {
         name: 'Alice Johnson',
         email: 'alice@example.com',
@@ -31,6 +34,7 @@ async function seed() {
         simSwapFlag: false,
         communityRating: '4.80',
         verifiedProBadge: true,
+        createdAt: pastDate,
       },
       {
         name: 'Bob Smith',
@@ -41,6 +45,7 @@ async function seed() {
         simSwapFlag: false,
         communityRating: '4.50',
         verifiedProBadge: false,
+        createdAt: pastDate,
       },
       {
         name: 'Charlie Brown',
@@ -51,8 +56,9 @@ async function seed() {
         simSwapFlag: false,
         communityRating: '4.90',
         verifiedProBadge: true,
+        createdAt: pastDate,
       },
-      // High risk workers (explicitly unverified, sim swap flagged, low rating)
+      // High risk workers (recent accounts by default, explicit risk signals)
       {
         name: 'Dave Danger',
         email: 'dave.danger@example.com',
@@ -85,6 +91,7 @@ async function seed() {
         phoneNumber: '+254711111111',
         role: 'client',
         kycStatus: 'verified',
+        createdAt: pastDate,
       },
       {
         name: 'New Client Two',
