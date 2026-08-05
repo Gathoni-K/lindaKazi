@@ -10,7 +10,7 @@ if (!process.env.DIRECT_URL) {
 
 export default defineConfig({
 
-    schema: './src/db/schema/index.ts',
+    schema: './src/db/schema/schema.ts',
 
 
     out: './drizzle/migrations',
