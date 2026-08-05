@@ -14,7 +14,7 @@ LindaKazi re-imagines this dynamic by creating a **dual-purpose infrastructure**
 
 ---
 
-## ✨ The Solution (How SalamaGig Works)
+## ✨ The Solution (How LindaKazi Works)
 
 LindaKazi solves the adoption trap through a **"Value-Hook, Security-Hold"** strategy: workers adopt the app to grow their business (Value-Hook) and stay safe while doing it (Security-Hold).
 
