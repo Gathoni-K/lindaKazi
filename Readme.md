@@ -1,53 +1,50 @@
 ## 📌 Project Overview
 
-**LindaKazi** is a hyper-local, high-impact STEM solution designed to address a critical, multi-layered crisis in our community: **the physical safety and economic invisibility of informal gig workers.** In Kenya and across developing economies, millions of informal workers (such as *mama fuas* [domestic cleaners], plumbers, electricians, and day laborers) enter strangers' homes daily to earn a living. They do so with zero institutional protections, leaving them highly vulnerable to harassment, wage theft, and violence. Furthermore, because their work is entirely offline, they have no verifiable career history, trapping them in economic stagnation.
+**LindaKazi** is a hyper-local, high-impact STEM solution addressing a critical, multi-layered crisis in our community: **the physical safety and economic invisibility of informal gig workers.** In Kenya and across developing economies, millions of informal workers (such as *mama fuas* [domestic cleaners], plumbers, electricians, and day laborers) enter strangers' homes daily to earn a living, with zero institutional protections — leaving them vulnerable to harassment, wage theft, and violence. At the same time, clients booking these workers have no reliable way to verify who they're letting into their homes.
 
-LindaKazi re-imagines this dynamic by creating a **dual-purpose infrastructure**: a professional verification portfolio that drives adoption via economic incentives, integrated with an automated, zero-friction safety security layer that protects their lives.
+LindaKazi addresses both sides of this trust gap: a verified identity and risk-check layer that protects clients, integrated with an automated, zero-friction safety layer that protects workers — all built on infrastructure (SMS, USSD, voice) that works on any phone, not just smartphones with reliable data.
 
 ---
 
 ## 🚨 The Problem
 
-1. **Physical Vulnerability & Lack of Accountability:** When a domestic worker or plumber goes into a new compound, their safety is completely invisible. They rely on manual check-ins ("call me when you get there"), which are frequently forgotten or cut off if a phone is seized or dies.
-2. **The "Shadow Economy" Traps Workers:** If an informal worker completes 500 excellent jobs, they still have a "zero CV" history in the eyes of formal financial systems. They cannot prove their income or reliability to access micro-loans, insurance, or business expansion.
-3. **The Marketplace Failure of Safety Apps:** Traditional safety/panic apps fail because users only download them out of fear and rarely open them until it's too late. To succeed, an app must provide **immediate daily value** to drive consistent user adoption.
+1. **Physical Vulnerability & Lack of Accountability:** When a domestic worker or plumber goes into a new compound, their safety is invisible. Manual check-ins ("call me when you get there") are easily forgotten or cut off if a phone dies.
+2. **Client-Side Trust Gap:** Clients have no way to verify a worker's identity or track record before letting them into their home — about 80% of informal gig workers operate without any identity verification today.
+3. **The Marketplace Failure of Safety Apps:** Traditional safety/panic apps fail because users only open them out of fear, and rarely use them consistently. To succeed, a safety layer has to run passively in the background of a transaction both sides already want to complete — not require a separate app workers have to remember to launch.
 
 ---
 
 ## ✨ The Solution (How LindaKazi Works)
 
-LindaKazi solves the adoption trap through a **"Value-Hook, Security-Hold"** strategy: workers adopt the app to grow their business (Value-Hook) and stay safe while doing it (Security-Hold).
+### 1. Client-Side Risk Verification
+* **SIM-Swap & Identity Check:** Before a gig is confirmed, LindaKazi runs a live SIM-swap check against the worker's number via Africa's Talking, combined with KYC status and community rating.
+* **AI Risk Classification:** Gemini AI classifies the combined risk signal into a tier, giving clients a clear, fast read on a worker's trustworthiness before they arrive.
+* **Graceful Fallback:** If the AI call fails or is unavailable, the system falls back to deterministic rule-based scoring — the pipeline never breaks, it degrades safely.
 
-### 1. The Professional Portfolio (Economic Sustainability)
-* **Verifiable Digital Identity:** Workers build a rich, localized digital resume capturing past work, verified client reviews, and rating milestones. 
-* **Trust Badges:** High-performing workers earn community-vetted trust marks that they can share with new clients over WhatsApp/SMS to negotiate better wages.
-* **Data-Driven Mobility:** Captures localized transactional and reputation history, creating a data trail that can eventually be leveraged for formal financial inclusion.
-
-### 2. The Automated Safety Guard (Social Sustainability)
-* **Smart Multi-Stage Timers:** Before starting a job, the worker opens a secure countdown timer based on estimated job duration (e.g., 3 hours for house cleaning). 
-* **Dead-Man's Switch Mechanism:** If the timer runs out and the worker fails to safely "Clock Out" via biometric or secure PIN verification, the system automatically triggers an emergency sequence.
-* **Escalated Emergency Alerts:** The backend instantly dispatches precise, real-time GPS coordinates, job details, and client phone numbers to designated family contacts and community emergency networks via SMS—**requiring zero active intervention from the worker during danger.**
+### 2. The Automated Safety Layer (Worker Protection)
+* **Gig Lifecycle Tracking:** Each gig moves through a tracked state — `pending → active → completed` — alongside a check-in state (`not started → awaiting → checked in / missed`).
+* **Passive Check-In:** Once a gig starts, the worker is expected to check in before the job's expected end time. No active monitoring needed from either side.
+* **Automatic SOS Escalation:** If a check-in is missed, the system automatically opens an SOS event and dispatches an emergency SMS to a designated contact — **zero active intervention required from the worker in a crisis.**
+* **Keypad SOS:** Workers can also self-trigger an SOS at any time via DTMF keypad (pressing '9' during an active voice session), for situations where they can act but can't safely use an app.
 
 ---
 
 ## 🌍 Hackathon Theme Alignment
 
-LindaKazi directly satisfies the core focus of the **Girls in STEM Global Hackathon**: *"Think globally. Solve locally."*
+LindaKazi directly supports the **Girls in STEM Global Hackathon** theme: *"Think globally. Solve locally."*
 
-* **Public Safety & Emergency Response:** Mitigates the daily physical threats faced by vulnerable informal workers entering unvetted private properties.
-* **Technology for Social Good:** Empowers an overlooked sector of society using accessible, low-bandwidth-friendly modern web technology.
-* **UN SDG 5 (Gender Equality):** Specifically protects women in the informal domestic care economy (*mama fuas*) who represent one of the highest-risk employment cohorts locally.
-* **UN SDG 8 (Decent Work & Economic Growth):** Lifts workers out of the gray market, driving long-term economic mobility and financial sustainability through professional reputation capital.
+* **Public Safety & Emergency Response:** Mitigates daily physical threats faced by informal workers entering unvetted private properties.
+* **Technology for Social Good:** Serves an overlooked sector using accessible, low-bandwidth technology — USSD and SMS work on any phone, not just smartphones.
+* **UN SDG 5 (Gender Equality):** Protects women in the informal domestic care economy (*mama fuas*), one of the highest-risk employment cohorts locally.
+* **UN SDG 8 (Decent Work & Economic Growth):** Builds a verified track record for informal workers, a first step toward the kind of provable history that's currently invisible to formal financial systems.
 
 ---
 
 ## 🛠️ Tech Stack
 
-LindaKazi is engineered using highly performant, scalable, and modern technologies optimized for quick iteration and real-world utility:
-
-* **Frontend Framework:** React 19 / Vite (Fast, light, and optimized for low-resource mobile browsers).
-* **Styling & Design System:** **Tailwind CSS v4** (Utilizing the new native CSS-first `@theme` configuration for precise design delivery).
-* **Backend & State Management:** Supabase (PostgreSQL database, real-time sync, and robust Edge Functions for rapid deployment).
-* **Location & Telephony Integrations:** * Geolocation API for background tracking during active timers.
-  * Twilio SMS / Africa's Talking API for automated emergency fail-safe messaging.
-
+* **Frontend:** React + TypeScript
+* **Backend:** Node.js / Express, with Zod-validated routes
+* **Database:** PostgreSQL via Drizzle ORM, hosted on Supabase
+* **Auth:** Supabase Auth with JWT-based session validation
+* **Risk Pipeline:** Rule-based scoring + Gemini AI classification, with deterministic fallback
+* **Telephony & Messaging:** Africa's Talking API for SMS dispatch, voice triggers, and SIM-swap/identity checks
