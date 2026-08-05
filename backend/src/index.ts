@@ -11,6 +11,8 @@ import { canAccessGig } from './utils/authHelpers';
 import { RiskScoringService } from './services/riskScoring.service';
 import { GeminiClassificationService } from './services/geminiClassification.service';
 import { SOSService } from './services/sos.service';
+import { createGigSchema } from './schemas/gig.schema';
+import { SimSwapService } from './services/simSwap.service';
 
 dotenv.config();
 
@@ -51,7 +53,41 @@ app.get('/api/auth/verify', requireAuth, (req: Request, res: Response) => {
   res.status(200).json({ message: 'Token is valid', user: req.user });
 });
 
-// 4. Gig Risk Check Route
+// 4. Create Gig Route
+app.post('/api/gigs', requireAuth, async (req: Request, res: Response) => {
+  try {
+    // A. Validate incoming body against gig schema
+    const validated = createGigSchema.parse(req.body);
+
+    // B. The authenticated user becomes the client
+    const clientId = req.user!.sub;
+
+    // C. Insert new gig row via Drizzle
+    const inserted = await db
+      .insert(gigs)
+      .values({
+        workerId: validated.workerId,
+        clientId,
+        location: validated.location,
+        title: validated.title ?? null,
+        expectedDurationMinutes: validated.expectedDurationMinutes ?? 60,
+        status: 'pending',
+      })
+      .returning();
+
+    // D. Return 201 with the persisted row (includes generated UUID id)
+    res.status(201).json({ message: 'Gig created successfully', gig: inserted[0] });
+  } catch (error: any) {
+    if (error instanceof ZodError) {
+      res.status(400).json({ error: 'Validation Error', details: error.issues });
+    } else {
+      console.error('[POST /api/gigs] DB insert error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+});
+
+// 5. Gig Risk Check Route
 app.post('/api/gigs/:id/risk-check', requireAuth, async (req: Request, res: Response) => {
   try {
     const paramId = req.params.id;
@@ -77,19 +113,44 @@ app.post('/api/gigs/:id/risk-check', requireAuth, async (req: Request, res: Resp
       return;
     }
 
-    // C. Run pure scoring function
+    // C. Live telemetry check — query SIM swap status at time of risk check
+    //    This replaces the stale boolean stored at registration with a fresh
+    //    signal from the telecom provider (mock in V1, real AT Insights in prod).
+    const liveSimSwapFlag = await SimSwapService.checkSimSwap(worker.phoneNumber);
+
+    // D. Persist the refreshed flag so the DB stays in sync with telemetry
+    if (liveSimSwapFlag !== worker.simSwapFlag) {
+      await db
+        .update(users)
+        .set({ simSwapFlag: liveSimSwapFlag, updatedAt: new Date() })
+        .where(eq(users.id, worker.id));
+
+      console.log(
+        `[risk-check] simSwapFlag updated for worker ${worker.id}: ` +
+        `${worker.simSwapFlag} → ${liveSimSwapFlag}`
+      );
+    }
+
+    // E. Calculate composite risk score using the live telemetry flag
     const { score, reasons } = RiskScoringService.calculateRiskScore({
       kycStatus: worker.kycStatus,
-      simSwapFlag: worker.simSwapFlag,
+      simSwapFlag: liveSimSwapFlag,          // ← live value, not stale DB flag
       communityRating: worker.communityRating,
       createdAt: worker.createdAt,
     });
 
-    // D. Send to Gemini and store result
-    const result = await GeminiClassificationService.evaluateGigRisk(gigId, score, reasons);
+    // F. Send to Gemini for classification and persist result to risk_checks table
+    const result = await GeminiClassificationService.evaluateGigRisk(gigId, score, reasons, worker.phoneNumber);
 
-    // E. Return structured result
-    res.status(200).json(result);
+
+    // G. Return structured result including the live telemetry flag for transparency
+    res.status(200).json({
+      ...result,
+      telemetry: {
+        simSwapDetected: liveSimSwapFlag,
+        compositeScore: score,
+      },
+    });
   } catch (error: any) {
     console.error('Risk check error:', error);
     res.status(500).json({ error: 'Internal server error' });

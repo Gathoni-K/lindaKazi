@@ -64,7 +64,9 @@ export default function SignUp() {
         email:       email.trim(),
         phoneNumber: phoneNumber.trim(),
         password,
+        role,
       });
+
 
       // 2. Immediately log the user in with the real credentials
       //    (signup returns no token by design — the user must confirm email

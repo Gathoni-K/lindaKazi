@@ -1,4 +1,4 @@
-import { ShieldCheck, Sparkles } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import RiskScoreCard from "./RiskScoreCard";
 import Reveal from "./Reveal";
 import { useRoleCTA } from "../hooks/useRoleCTA";

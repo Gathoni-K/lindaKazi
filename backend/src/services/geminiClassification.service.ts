@@ -22,7 +22,19 @@ export class GeminiClassificationService {
     flagged_decline: "High risk detected: {reasons}. Consider declining or requesting additional verification.",
   };
 
-  static async evaluateGigRisk(gigId: string, score: number, reasons: string[]): Promise<ClassificationResult> {
+  /**
+   * @param gigId           - The gig being assessed.
+   * @param score           - Composite risk score (0–100).
+   * @param reasons         - Human-readable signals that contributed to the score.
+   * @param workerPhone     - E.164 phone number of the worker — used to SMS
+   *                          the final verdict directly to the worker.
+   */
+  static async evaluateGigRisk(
+    gigId: string,
+    score: number,
+    reasons: string[],
+    workerPhone?: string,
+  ): Promise<ClassificationResult> {
     const fallbackLevel = RiskScoringService.mapScoreToRiskLevel(score);
     let finalRiskLevel = fallbackLevel;
     let finalMessage = "AI classification unavailable. Rule-based risk level applied.";
@@ -81,7 +93,7 @@ Return ONLY a valid JSON object in this exact format, with no markdown formattin
        console.warn('[GeminiClassificationService] GEMINI_API_KEY missing, using fallback rule-based classification.');
     }
 
-    // Store the result in the database
+    // ── Persist result to the database ──────────────────────────────────────
     try {
       await db.insert(riskChecks).values({
         gigId,
@@ -94,12 +106,31 @@ Return ONLY a valid JSON object in this exact format, with no markdown formattin
       console.error('[GeminiClassificationService] Failed to save risk check to DB:', dbError);
     }
 
+    // ── SMS dispatch ─────────────────────────────────────────────────────────
+    // 1. Always notify the worker with their personal risk verdict
+    if (workerPhone) {
+      const riskLabel = finalRiskLevel.toUpperCase();
+      const workerSms = `[LindaKazi Safety] ${riskLabel}. ${finalMessage}`;
+      SMSService.sendSMS(workerPhone, workerSms).catch((err) =>
+        console.error('[GeminiClassificationService] Worker SMS failed:', err)
+      );
+      console.log(`[GeminiClassificationService] Risk SMS dispatched to worker (${workerPhone}): ${riskLabel}`);
+    } else {
+      console.warn('[GeminiClassificationService] workerPhone not provided — worker SMS skipped.');
+    }
+
+    // 2. On HIGH risk, also alert the configured emergency contact
     if (finalRiskLevel === 'high') {
       const emergencyContact = process.env.EMERGENCY_CONTACT_NUMBER;
       if (emergencyContact) {
-        SMSService.sendSMS(emergencyContact, `HIGH RISK ALERT: Gig ${gigId} has been flagged as high risk. Please review immediately.`);
+        SMSService.sendSMS(
+          emergencyContact,
+          `HIGH RISK ALERT: Gig ${gigId} flagged HIGH risk (score: ${score}/100). Reasons: ${reasons.join(', ') || 'N/A'}. Review immediately.`
+        ).catch((err) =>
+          console.error('[GeminiClassificationService] Emergency SMS failed:', err)
+        );
       } else {
-        console.warn('[GeminiClassificationService] EMERGENCY_CONTACT_NUMBER not set. High risk SMS not sent.');
+        console.warn('[GeminiClassificationService] EMERGENCY_CONTACT_NUMBER not set. High risk emergency SMS not sent.');
       }
     }
 

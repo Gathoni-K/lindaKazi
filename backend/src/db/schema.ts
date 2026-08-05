@@ -31,6 +31,8 @@ export const gigs = pgTable('gigs', {
   actualEndAt: timestamp('actual_end_at'),
   checkinStatus: checkinStatusEnum('checkin_status').default('not_started').notNull(),
   location: text('location'),
+  title: text('title'),
+
 }, (table) => {
   return {
     workerIdIdx: index('gigs_worker_id_idx').on(table.workerId),
