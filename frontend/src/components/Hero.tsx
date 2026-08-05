@@ -1,4 +1,4 @@
-import { ShieldCheck, Sparkles } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import RiskScoreCard from "./RiskScoreCard";
 import Reveal from "./Reveal";
 import { useRoleCTA } from "../hooks/useRoleCTA";
@@ -20,7 +20,7 @@ export default function Hero() {
                     <h1 className="mt-6 font-display text-4xl font-bold leading-[1.08] tracking-tight text-paper sm:text-5xl lg:text-[3.4rem]">
             The trust layer
             <br />
-            <span className="bg-gradient-to-r from-teal via-teal-soft to-amber bg-clip-text text-transparent">
+            <span className="text-paper">
               gig work was missing.
             </span>
           </h1>

@@ -1,6 +1,4 @@
-
 import { Routes, Route } from "react-router-dom";
-
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ScrollToTopButton from "./components/ScrollToTopButton";
@@ -8,16 +6,17 @@ import ScrollToHash from "./components/ScrollToHash";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
 import Home from "./pages/Home";
-
 import Login from "./pages/Login";
+
+import Signup from "./pages/Signup";
 
 import About from "./pages/About";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import WorkerDashboard from "./pages/dashboard/WorkerDashboard";
 import Safety from "./pages/dashboard/Safety";
 import Earnings from "./pages/dashboard/Earnings";
-import ClientDashboard from "./pages/dashboard/ClientDashboard";
 import WorkerAlerts from "./pages/dashboard/WorkerAlerts";
+import ClientDashboard from "./pages/dashboard/ClientDashboard";
 import ClientAlerts from "./pages/dashboard/ClientAlerts";
 
 function PublicSite() {
@@ -28,8 +27,9 @@ function PublicSite() {
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
-
           <Route path="/login" element={<Login />} />
+
+          <Route path="/signup" element={<Signup />} />
 
           <Route path="/about" element={<About />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
@@ -55,7 +55,7 @@ export default function App() {
         <Route index element={<WorkerDashboard />} />
         <Route path="safety" element={<Safety />} />
         <Route path="earnings" element={<Earnings />} />
-         <Route path="alerts" element={<WorkerAlerts />} />
+        <Route path="alerts" element={<WorkerAlerts />} />
       </Route>
 
       <Route
