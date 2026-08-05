@@ -61,7 +61,9 @@ export interface SignUpPayload {
   email: string;
   phoneNumber: string;
   password: string;
+  role: 'worker' | 'client' | 'both';
 }
+
 
 export interface SignUpResponse {
   id: string;
@@ -100,6 +102,53 @@ export const authApi = {
   verify: (token: string) =>
     request<{ message: string; user: unknown }>("/api/auth/verify", {
       method: "GET",
+      token,
+    }),
+};
+
+// ── Gig endpoints ─────────────────────────────────────────────────────────────
+
+export interface CreateGigPayload {
+  workerId: string;
+  location: string;
+  title?: string;
+  expectedDurationMinutes?: number;
+}
+
+export interface CreateGigResponse {
+  message: string;
+  gig: {
+    id: string;
+    workerId: string;
+    clientId: string;
+    status: string;
+    location: string;
+    title: string | null;
+  };
+}
+
+export interface RiskCheckResponse {
+  status: 'success' | 'pending';
+  riskLevel: 'low' | 'medium' | 'high';
+  message: string;
+  reasons: string[];
+  telemetry?: {
+    simSwapDetected: boolean;
+    compositeScore: number;
+  };
+}
+
+export const gigApi = {
+  create: (payload: CreateGigPayload, token: string) =>
+    request<CreateGigResponse>("/api/gigs", {
+      method: "POST",
+      body: payload as unknown as Record<string, unknown>,
+      token,
+    }),
+
+  runRiskCheck: (gigId: string, token: string) =>
+    request<RiskCheckResponse>(`/api/gigs/${gigId}/risk-check`, {
+      method: "POST",
       token,
     }),
 };

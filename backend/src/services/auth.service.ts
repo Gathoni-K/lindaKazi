@@ -47,6 +47,7 @@ export class AuthService {
         data: {
           name: validatedInput.name,
           phone: validatedInput.phoneNumber,
+          role: validatedInput.role,   // passed in metadata so trigger can consume it
         },
       },
     });
@@ -56,28 +57,23 @@ export class AuthService {
     }
 
     // 4. The public.users row is created automatically by the Postgres trigger
-    //    `on_auth_user_created` which fires on every insert into auth.users.
-    //    This avoids the dual-write race condition and keeps the two writes atomic.
-    //
-    //    Trigger SQL (run once in Supabase SQL Editor):
-    //
-    //    create or replace function public.handle_new_user()
-    //    returns trigger language plpgsql security definer set search_path = public as $$
-    //    begin
-    //      insert into public.users (id, name, email, phone_number)
-    //      values (new.id, new.raw_user_meta_data ->> 'name',
-    //              new.email, new.raw_user_meta_data ->> 'phone');
-    //      return new;
-    //    end;
-    //    $$;
-    //
-    //    create trigger on_auth_user_created
-    //      after insert on auth.users
-    //      for each row execute procedure public.handle_new_user();
+    //    `on_auth_user_created`. Because the trigger does not know the app-level
+    //    role, we patch it immediately after signup via a Drizzle update.
+    //    This is intentionally non-blocking — if it fails the user can still log
+    //    in and the role defaults to 'client' until corrected.
+    try {
+      await db
+        .update(users)
+        .set({ role: validatedInput.role })
+        .where(eq(users.id, authData.user.id));
+    } catch (roleErr) {
+      console.error('[AuthService] Failed to persist role after signup:', roleErr);
+    }
 
     return {
       id: authData.user.id,
       email: authData.user.email,
+      role: validatedInput.role,
       message: 'User created. Check your email to confirm your account before logging in.',
     };
   }

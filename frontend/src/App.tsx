@@ -7,7 +7,9 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+
 import Signup from "./pages/Signup";
+
 import About from "./pages/About";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import WorkerDashboard from "./pages/dashboard/WorkerDashboard";
@@ -26,7 +28,9 @@ function PublicSite() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+
           <Route path="/signup" element={<Signup />} />
+
           <Route path="/about" element={<About />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         </Routes>
