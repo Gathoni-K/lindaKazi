@@ -107,30 +107,34 @@ Return ONLY a valid JSON object in this exact format, with no markdown formattin
     }
 
     // ── SMS dispatch ─────────────────────────────────────────────────────────
-    // 1. Always notify the worker with their personal risk verdict
-    if (workerPhone) {
-      const riskLabel = finalRiskLevel.toUpperCase();
-      const workerSms = `[LindaKazi Safety] ${riskLabel}. ${finalMessage}`;
-      SMSService.sendSMS(workerPhone, workerSms).catch((err) =>
-        console.error('[GeminiClassificationService] Worker SMS failed:', err)
-      );
-      console.log(`[GeminiClassificationService] Risk SMS dispatched to worker (${workerPhone}): ${riskLabel}`);
-    } else {
-      console.warn('[GeminiClassificationService] workerPhone not provided — worker SMS skipped.');
-    }
-
-    // 2. On HIGH risk, also alert the configured emergency contact
-    if (finalRiskLevel === 'high') {
-      const emergencyContact = process.env.EMERGENCY_CONTACT_NUMBER;
-      if (emergencyContact) {
-        SMSService.sendSMS(
-          emergencyContact,
-          `HIGH RISK ALERT: Gig ${gigId} flagged HIGH risk (score: ${score}/100). Reasons: ${reasons.join(', ') || 'N/A'}. Review immediately.`
-        ).catch((err) =>
-          console.error('[GeminiClassificationService] Emergency SMS failed:', err)
+    if ((finalRiskLevel === 'high' || finalRiskLevel === 'medium') && workerPhone) {
+      const warningMessage = `[LindaKazi Safety Alert] Risk Level: ${finalRiskLevel.toUpperCase()}. Reason: ${finalMessage}. Recommended action: Request video call before proceeding.`;
+      
+      try {
+        // Dispatch non-blocking SMS
+        SMSService.sendSMS(workerPhone, warningMessage).catch(err => 
+          console.error('[GeminiClassificationService] Worker SMS failed:', err)
         );
-      } else {
-        console.warn('[GeminiClassificationService] EMERGENCY_CONTACT_NUMBER not set. High risk emergency SMS not sent.');
+      } catch (err) {
+        console.error('[GeminiClassificationService] Worker SMS throw:', err);
+      }
+      
+      if (finalRiskLevel === 'high') {
+        const emergencyContact = process.env.EMERGENCY_CONTACT_NUMBER;
+        if (emergencyContact) {
+          try {
+            SMSService.sendSMS(
+              emergencyContact,
+              `HIGH RISK ALERT: Gig ${gigId} flagged HIGH risk (score: ${score}/100). Reasons: ${reasons.join(', ') || 'N/A'}. Review immediately.`
+            ).catch(err => 
+              console.error('[GeminiClassificationService] Emergency SMS failed:', err)
+            );
+          } catch (err) {
+            console.error('[GeminiClassificationService] Emergency SMS throw:', err);
+          }
+        } else {
+          console.warn('[GeminiClassificationService] EMERGENCY_CONTACT_NUMBER not set. High risk emergency SMS not sent.');
+        }
       }
     }
 

@@ -138,6 +138,14 @@ export interface RiskCheckResponse {
   };
 }
 
+export interface GigActionResponse {
+  message: string;
+  gig?: {
+    id: string;
+    status: string;
+  };
+}
+
 export const gigApi = {
   create: (payload: CreateGigPayload, token: string) =>
     request<CreateGigResponse>("/api/gigs", {
@@ -148,6 +156,24 @@ export const gigApi = {
 
   runRiskCheck: (gigId: string, token: string) =>
     request<RiskCheckResponse>(`/api/gigs/${gigId}/risk-check`, {
+      method: "POST",
+      token,
+    }),
+
+  startGig: (gigId: string, token: string) =>
+    request<GigActionResponse>(`/api/gigs/${gigId}/start`, {
+      method: "POST",
+      token,
+    }),
+
+  checkinGig: (gigId: string, token: string) =>
+    request<GigActionResponse>(`/api/gigs/${gigId}/checkin`, {
+      method: "POST",
+      token,
+    }),
+
+  simulateTimeout: (gigId: string, token: string) =>
+    request<GigActionResponse>(`/api/gigs/${gigId}/simulate-timeout`, {
       method: "POST",
       token,
     }),

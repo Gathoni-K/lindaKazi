@@ -12,6 +12,9 @@ import {
   Navigation,
   CheckCircle2,
   Loader2,
+  UserCheck,
+  Siren,
+  X,
 } from "lucide-react";
 import Reveal from "../../components/Reveal";
 import Avatar from "../../components/Avatar";
@@ -49,8 +52,14 @@ export default function ClientDashboard() {
   const [activeGig, setActiveGig] = useState<CreateGigResponse['gig'] | null>(null);
   const [riskResult, setRiskResult] = useState<RiskCheckResponse | null>(null);
 
+  // ── Gig Lifecycle State ─────────────────────────────────────────────────────
+  const [gigLiveStatus, setGigLiveStatus] = useState<"scheduled" | "in-progress" | "checked-in">("scheduled");
+  const [isStarting, setIsStarting] = useState(false);
+  const [isCheckingIn, setIsCheckingIn] = useState(false);
+  const [isSimulatingTimeout, setIsSimulatingTimeout] = useState(false);
+  const [sosAlertMessage, setSosAlertMessage] = useState<string | null>(null);
+
   // ── Other UI State ──────────────────────────────────────────────────────────
-  const [gigState, setGigState] = useState<"scheduled" | "in-progress">("scheduled");
   const [reportOpen, setReportOpen] = useState(false);
   const [reportSent, setReportSent] = useState(false);
   const [issueText, setIssueText] = useState("");
@@ -94,7 +103,50 @@ export default function ClientDashboard() {
     }
   };
 
-  const handleStartGig = () => setGigState("in-progress");
+  const handleStartGig = async () => {
+    if (!token || !activeGig) return;
+    setError(null);
+    setIsStarting(true);
+    try {
+      await gigApi.startGig(activeGig.id, token);
+      setGigLiveStatus("in-progress");
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Failed to start gig.");
+    } finally {
+      setIsStarting(false);
+    }
+  };
+
+  const handleCheckin = async () => {
+    if (!token || !activeGig) return;
+    setError(null);
+    setIsCheckingIn(true);
+    try {
+      await gigApi.checkinGig(activeGig.id, token);
+      setGigLiveStatus("checked-in");
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Worker check-in failed.");
+    } finally {
+      setIsCheckingIn(false);
+    }
+  };
+
+  const handleSimulateTimeout = async () => {
+    if (!token || !activeGig) return;
+    setError(null);
+    setSosAlertMessage(null);
+    setIsSimulatingTimeout(true);
+    try {
+      const res = await gigApi.simulateTimeout(activeGig.id, token);
+      setSosAlertMessage(res.message ?? "SOS triggered — emergency SMS dispatched.");
+    } catch (err) {
+      setSosAlertMessage(
+        err instanceof ApiError ? err.message : "Timeout simulation failed."
+      );
+    } finally {
+      setIsSimulatingTimeout(false);
+    }
+  };
 
   const handleSubmitReport = () => {
     if (!issueText.trim()) return;
@@ -294,49 +346,108 @@ export default function ClientDashboard() {
             {/* Right column */}
             <div className="flex flex-col gap-6">
               <Reveal delay={120}>
-                <div className="rounded-card border border-line bg-surface p-6 text-center">
-                  <h2 className="font-display text-base font-semibold text-paper">
-                    Ready to Proceed?
+                <div className="rounded-card border border-line bg-surface p-6">
+                  <h2 className="font-display text-base font-semibold text-paper text-center">
+                    Gig Controls
                   </h2>
-                  <p className="mt-2 text-xs leading-relaxed text-mist">
-                    By starting the gig, you confirm the worker's identity
-                    matches the Trust Passport above.
+                  <p className="mt-1 text-center text-xs leading-relaxed text-mist">
+                    Manage the live state of this gig and test emergency flows.
                   </p>
 
                   <div className="mt-5 flex flex-col gap-2.5">
+                    {/* ── START GIG ─────────────────────────────────────────── */}
                     <button
+                      id="btn-start-gig"
                       onClick={handleStartGig}
-                      disabled={gigState === "in-progress" || isCheckingRisk}
+                      disabled={gigLiveStatus !== "scheduled" || isCheckingRisk || isStarting}
                       className={`inline-flex items-center justify-center gap-2 rounded-pill px-5 py-3 text-sm font-semibold transition-all ${
-                        gigState === "in-progress"
+                        gigLiveStatus !== "scheduled"
                           ? "cursor-default bg-teal/20 text-teal"
                           : "bg-teal text-ink shadow-[0_0_25px_-5px_rgba(46,230,199,0.6)] hover:-translate-y-0.5 hover:bg-teal-dim disabled:opacity-50 disabled:hover:translate-y-0"
                       }`}
                     >
-                      {gigState === "in-progress" ? (
-                        <>
-                          <CheckCircle2 size={16} />
-                          Gig In Progress
-                        </>
+                      {isStarting ? (
+                        <Loader2 size={15} className="animate-spin" />
+                      ) : gigLiveStatus !== "scheduled" ? (
+                        <CheckCircle2 size={16} />
                       ) : (
-                        <>
-                          <Play size={15} />
-                          Start Gig
-                        </>
+                        <Play size={15} />
                       )}
+                      {gigLiveStatus === "scheduled" ? "Start Gig" :
+                       gigLiveStatus === "in-progress" ? "Gig In Progress" :
+                       "Worker Checked In"}
                     </button>
 
+                    {/* ── WORKER CHECK-IN ───────────────────────────────────── */}
                     <button
-                      onClick={() => setReportOpen((v) => !v)}
-                      className="inline-flex items-center justify-center gap-2 rounded-pill border border-line px-5 py-3 text-sm font-semibold text-paper transition-colors hover:border-danger/50 hover:text-danger"
+                      id="btn-worker-checkin"
+                      onClick={handleCheckin}
+                      disabled={gigLiveStatus !== "in-progress" || isCheckingIn}
+                      className="inline-flex items-center justify-center gap-2 rounded-pill border border-line px-5 py-3 text-sm font-semibold text-paper transition-colors hover:border-teal/50 hover:text-teal disabled:cursor-not-allowed disabled:opacity-40"
                     >
-                      <AlertTriangle size={15} />
+                      {isCheckingIn ? (
+                        <Loader2 size={15} className="animate-spin" />
+                      ) : (
+                        <UserCheck size={15} />
+                      )}
+                      Worker Check-In
+                    </button>
+
+                    {/* ── SIMULATE TIMEOUT (Demo) ───────────────────────────── */}
+                    <button
+                      id="btn-simulate-timeout"
+                      onClick={handleSimulateTimeout}
+                      disabled={gigLiveStatus === "scheduled" || isSimulatingTimeout}
+                      className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-pill border border-danger/50 bg-danger/10 px-5 py-3 text-sm font-semibold text-danger transition-all hover:bg-danger/20 hover:shadow-[0_0_20px_-4px_rgba(255,80,80,0.5)] disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      {isSimulatingTimeout ? (
+                        <Loader2 size={15} className="animate-spin" />
+                      ) : (
+                        <Siren size={15} className="group-hover:animate-pulse" />
+                      )}
+                      {isSimulatingTimeout ? "Triggering SOS…" : "Simulate Timeout (Demo Only)"}
+                    </button>
+                  </div>
+
+                  {/* ── SOS ALERT BANNER ──────────────────────────────────── */}
+                  {sosAlertMessage && (
+                    <div className="mt-5 relative rounded-lg border border-danger/40 bg-danger/10 p-4 text-left">
+                      <div className="absolute -top-1 -left-1 h-3 w-3 rounded-full bg-danger animate-ping opacity-75" />
+                      <div className="flex items-start gap-3">
+                        <Siren size={18} className="mt-0.5 shrink-0 text-danger" />
+                        <div className="flex-1">
+                          <p className="font-mono text-[10px] font-semibold uppercase tracking-wider text-danger">
+                            SOS Triggered
+                          </p>
+                          <p className="mt-1 text-xs leading-relaxed text-mist">
+                            {sosAlertMessage}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setSosAlertMessage(null)}
+                          className="shrink-0 rounded p-0.5 text-mist-dim hover:text-danger"
+                          aria-label="Dismiss alert"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ── REPORT ISSUE ──────────────────────────────────────── */}
+                  <div className="mt-4">
+                    <button
+                      id="btn-report-issue"
+                      onClick={() => setReportOpen((v) => !v)}
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-pill border border-line px-5 py-2.5 text-xs font-semibold text-mist transition-colors hover:border-danger/50 hover:text-danger"
+                    >
+                      <AlertTriangle size={13} />
                       Report Issue
                     </button>
                   </div>
 
                   {reportOpen && (
-                    <div className="mt-4 rounded-lg border border-danger/30 bg-danger/5 p-4 text-left">
+                    <div className="mt-3 rounded-lg border border-danger/30 bg-danger/5 p-4 text-left">
                       <label className="font-mono text-[10px] uppercase tracking-wide text-mist-dim">
                         Describe the issue
                       </label>
